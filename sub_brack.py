@@ -16,3 +16,4 @@ for i, line in enumerate(grammar_line_list):
     if re.search(r"\{\s*(\w+)\s*\}", line):
         new_line = re.sub(r"\{\s*(\w+)\s*\}", r"\1*", line)
     elif re.search(r"")
+
