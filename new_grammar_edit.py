@@ -9,6 +9,9 @@ library_description : library_declaration
                     | config_declaration
 library_declaration : "library" library_identifier file_path_spec [ ( "," file_path_spec )* ] [ "-incdir" file_path_spec ( "," file_path_spec )* ] ";"
 include_statement : "include" file_path_spec ";"
+# added by xiaoaxiang1
+file_path_spec: /(\/)?([^\/\s]+(\/|$))*/
+
 
 # A.1.2 Verilog source text
 source_text : description*
@@ -162,7 +165,7 @@ param_assignment : parameter_identifier "=" constant_mintypmax_expression
 specparam_assignment : specparam_identifier "=" constant_mintypmax_expression
                      | pulse_control_specparam
 pulse_control_specparam : "PATHPULSE$" "=" "(" reject_limit_value [ "," error_limit_value ] ")"
-                        | "PATHPULSE$"specify_input_terminal_descriptor"$"specify_output_terminal_descriptor = "(" reject_limit_value [ "," error_limit_value ] ")"
+                        | "PATHPULSE$"specify_input_terminal_descriptor"$"specify_output_terminal_descriptor "=" "(" reject_limit_value [ "," error_limit_value ] ")"
 error_limit_value : limit_value
 reject_limit_value : limit_value
 limit_value : constant_mintypmax_expression
@@ -540,8 +543,7 @@ timing_check_limit : expression
 
 # A.7.5.3 System timing check event definitions
 timing_check_event : [timing_check_event_control] specify_terminal_descriptor [ "&&&" timing_check_condition ]
-controlled_timing_check_event :
-timing_check_event_control specify_terminal_descriptor [ "&&&" timing_check_condition ]
+controlled_timing_check_event : timing_check_event_control specify_terminal_descriptor [ "&&&" timing_check_condition ]
 timing_check_event_control : "posedge"
                            | "negedge"
                            | edge_control_specifier
@@ -695,7 +697,7 @@ z_digit : "z" | "Z" | "?"
 
 # A.8.8 Strings
 # string : " Any_ASCII_Characters_except_new_line* "
-string : '"' ( /./ )* '"'
+string : "\"" ( /./ )* "\""
 
 # A.9 General
 # A.9.1 Attributes
@@ -704,11 +706,13 @@ attr_spec : attr_name [ "=" constant_expression ]
 attr_name : identifier
 
 # A.9.2 Comments
-comment : one_line_comment | block_comment
-one_line_comment : "//" comment_text "\n"
-block_comment : "/*" comment_text "*/"
-#comment_text : Any_ASCII_character*
-comment_test : ( /./s )*
+# comment : one_line_comment | block_comment
+# one_line_comment : "\/\/" comment_text "\\n"
+# block_comment : "\/*" comment_text "*\/"
+# comment_text : Any_ASCII_character*
+# comment_test : ( /./s )*
+ONE_LINE_COMMENT : /\/\/[^\\n]*\\n/
+BLOCK_COMMENT : /\/\*(\*(?!\/)|[^*])*\*\//
 
 # A.9.3 Identifiers
 block_identifier : identifier
@@ -757,5 +761,6 @@ variable_identifier : identifier
 # A.9.4 White space
 # white_space : space | tab | newline | eof
 
-%ignore comment
+%ignore ONE_LINE_COMMENT
+%ignore BLOCK_COMMENT
 """
