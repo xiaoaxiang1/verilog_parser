@@ -776,21 +776,14 @@ BLOCK_COMMENT : /\/\*(\*(?!\/)|[^*])*\*\//
 # A.9.3 Identifiers
 # block_identifier : IDENTIFIER
 # cell_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # config_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 #ESCAPED_IDENTIFIER : \ Any_ASCII_character_except_white_space* white_space
 ESCAPED_IDENTIFIER : "\\" ( /\S/ )* /\s/
 # event_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # function_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # gate_instance_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # generate_block_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # genvar_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 hierarchical_block_identifier : hierarchical_identifier
 hierarchical_event_identifier : hierarchical_identifier
 hierarchical_function_identifier : hierarchical_identifier
@@ -802,48 +795,34 @@ hierarchical_task_identifier : hierarchical_identifier
 IDENTIFIER : SIMPLE_IDENTIFIER
            | ESCAPED_IDENTIFIER
 # inout_port_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # input_port_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # INSTANCE_IDENTIFIER : IDENTIFIER
 # library_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # module_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # module_instance_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # net_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # output_port_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # parameter_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # port_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # real_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 SIMPLE_IDENTIFIER : /[a-zA-Z_]/( /[a-zA-Z0-9_$]/ )*
 # specparam_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 system_function_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
 system_task_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
 # task_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # terminal_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # text_macro_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # TOPMODULE_IDENTIFIER : IDENTIFIER
 # udp_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # udp_instance_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 # variable_identifier : IDENTIFIER
-IDENTIFIER : IDENTIFIER
 
 # A.9.4 White space
 # white_space : space | tab | newline | eof
 
 %ignore ONE_LINE_COMMENT
 %ignore BLOCK_COMMENT
+
+%import common.WS
+%ignore WS
 """
