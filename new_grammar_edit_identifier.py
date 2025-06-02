@@ -7,7 +7,8 @@ library_text : library_description*
 library_description : library_declaration
                     | include_statement
                     | config_declaration
-library_declaration : "library" library_identifier file_path_spec [ ( "," file_path_spec )* ] [ "-incdir" file_path_spec ( "," file_path_spec )* ] ";"
+# library_declaration : "library" library_identifier file_path_spec [ ( "," file_path_spec )* ] [ "-incdir" file_path_spec ( "," file_path_spec )* ] ";"
+library_declaration : "library" IDENTIFIER file_path_spec [ ( "," file_path_spec )* ] [ "-incdir" file_path_spec ( "," file_path_spec )* ] ";"
 include_statement : "include" file_path_spec ";"
 # added by xiaoaxiang1
 file_path_spec: /(\/)?([^\/\s]+(\/|$))*/
@@ -18,8 +19,10 @@ source_text : description*
 description : module_declaration
             | udp_declaration
             | config_declaration
-module_declaration : attribute_instance* module_keyword module_identifier [ module_parameter_port_list ] list_of_ports ";" module_item* "endmodule"
-                   | attribute_instance* module_keyword module_identifier [ module_parameter_port_list ] [ list_of_port_declarations ] ";" non_port_module_item* "endmodule"
+# module_declaration : attribute_instance* module_keyword module_identifier [ module_parameter_port_list ] list_of_ports ";" module_item* "endmodule"
+module_declaration : attribute_instance* module_keyword IDENTIFIER [ module_parameter_port_list ] list_of_ports ";" module_item* "endmodule"
+#                    | attribute_instance* module_keyword module_identifier [ module_parameter_port_list ] [ list_of_port_declarations ] ";" non_port_module_item* "endmodule"
+                   | attribute_instance* module_keyword IDENTIFIER [ module_parameter_port_list ] [ list_of_port_declarations ] ";" non_port_module_item* "endmodule"
 module_keyword : "module" | "macromodule"
 
 # A.1.3 Module parameters and ports
@@ -28,10 +31,12 @@ list_of_ports : "(" port ( "," port )* ")"
 list_of_port_declarations : "(" port_declaration ( "," port_declaration )* ")"
                           | "(" ")"
 port : [ port_expression ]
-     | "." port_identifier "(" [ port_expression ] ")"
+#      | "." port_identifier "(" [ port_expression ] ")"
+     | "." IDENTIFIER "(" [ port_expression ] ")"
 port_expression : port_reference
                 | "{" port_reference ( "," port_reference )* "}"
-port_reference : port_identifier [ "[" constant_range_expression "]" ]
+# port_reference : port_identifier [ "[" constant_range_expression "]" ]
+port_reference : IDENTIFIER [ "[" constant_range_expression "]" ]
 port_declaration : attribute_instance* inout_declaration
                  | attribute_instance* input_declaration
                  | attribute_instance* output_declaration
@@ -68,8 +73,10 @@ non_port_module_item : module_or_generate_item
 parameter_override : "defparam" list_of_defparam_assignments ";"
 
 # A.1.5 Configuration source text
-config_declaration : "config" config_identifier ";" design_statement config_rule_statement* "endconfig"
-design_statement : "design" ( [library_identifier"."]cell_identifier )* ";"
+# config_declaration : "config" config_identifier ";" design_statement config_rule_statement* "endconfig"
+config_declaration : "config" IDENTIFIER ";" design_statement config_rule_statement* "endconfig"
+# design_statement : "design" ( [library_identifier"."]cell_identifier )* ";"
+design_statement : "design" ( [IDENTIFIER"."]IDENTIFIER )* ";"
 config_rule_statement : default_clause liblist_clause ";"
                       | inst_clause liblist_clause ";"
                       | inst_clause use_clause ";"
@@ -79,9 +86,12 @@ default_clause : "default"
 inst_clause : "instance" inst_name
 # inst_name : TOPMODULE_IDENTIFIER ( "." INSTANCE_IDENTIFIER )*
 inst_name : IDENTIFIER ( "." IDENTIFIER )*
-cell_clause : "cell" [ library_identifier"."]cell_identifier
-liblist_clause : "liblist" library_identifier*
-use_clause : "use" [library_identifier"."]cell_identifier[":config"]
+# cell_clause : "cell" [ library_identifier"."]cell_identifier
+cell_clause : "cell" [ IDENTIFIER"."]IDENTIFIER
+# liblist_clause : "liblist" library_identifier*
+liblist_clause : "liblist" IDENTIFIER*
+# use_clause : "use" [library_identifier"."]cell_identifier[":config"]
+use_clause : "use" [IDENTIFIER"."]IDENTIFIER[":config"]
 
 # A.2 Declarations
 # A.2.1 Declaration types
@@ -94,27 +104,42 @@ specparam_declaration : "specparam" [ range ] list_of_specparam_assignments ";"
 parameter_type : "integer" | "real" | "realtime" | "time"
 
 # A.2.1.2 Port declarations
-inout_declaration : "inout" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
-input_declaration : "input" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
-output_declaration : "output" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
-                   | "output" "reg" [ "signed" ] [ range ] list_of_variable_port_identifiers
-                   | "output" output_variable_type list_of_variable_port_identifiers
+# inout_declaration : "inout" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
+inout_declaration : "inout" [ net_type ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+# input_declaration : "input" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
+input_declaration : "input" [ net_type ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+# output_declaration : "output" [ net_type ] [ "signed" ] [ range ] list_of_port_identifiers
+output_declaration : "output" [ net_type ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+#                    | "output" "reg" [ "signed" ] [ range ] list_of_variable_port_identifiers
+                   | "output" "reg" [ "signed" ] [ range ] list_of_variable_IDENTIFIERs
+#                    | "output" output_variable_type list_of_variable_port_identifiers
+                   | "output" output_variable_type list_of_variable_IDENTIFIERs
 
 # A.2.1.3 Type declarations
-event_declaration : "event" list_of_event_identifiers ";"
-integer_declaration : "integer" list_of_variable_identifiers ";"
-net_declaration : net_type [ "signed" ] [ delay3 ] list_of_net_identifiers ";"
+# event_declaration : "event" list_of_event_identifiers ";"
+event_declaration : "event" list_of_IDENTIFIERs ";"
+# integer_declaration : "integer" list_of_variable_identifiers ";"
+integer_declaration : "integer" list_of_IDENTIFIERs ";"
+# net_declaration : net_type [ "signed" ] [ delay3 ] list_of_net_identifiers ";"
+net_declaration : net_type [ "signed" ] [ delay3 ] list_of_IDENTIFIERs ";"
                 | net_type [ drive_strength ] [ "signed" ] [ delay3 ] list_of_net_decl_assignments ";"
-                | net_type [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_identifiers ";"
+#                 | net_type [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_identifiers ";"
+                | net_type [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_IDENTIFIERs ";"
                 | net_type [ drive_strength ] [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_decl_assignments ";"
-                | "trireg" [ charge_strength ] [ "signed" ] [ delay3 ] list_of_net_identifiers ";"
+#                 | "trireg" [ charge_strength ] [ "signed" ] [ delay3 ] list_of_net_identifiers ";"
+                | "trireg" [ charge_strength ] [ "signed" ] [ delay3 ] list_of_IDENTIFIERs ";"
                 | "trireg" [ drive_strength ] [ "signed" ] [ delay3 ] list_of_net_decl_assignments ";"
-                | "trireg" [ charge_strength ] [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_identifiers ";"
+#                 | "trireg" [ charge_strength ] [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_identifiers ";"
+                | "trireg" [ charge_strength ] [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_IDENTIFIERs ";"
                 | "trireg" [ drive_strength ] [ "vectored" | "scalared" ] [ "signed" ] range [ delay3 ] list_of_net_decl_assignments ";"
-real_declaration : "real" list_of_real_identifiers ";"
-realtime_declaration : "realtime" list_of_real_identifiers ";"
-reg_declaration : "reg" [ "signed" ] [ range ] list_of_variable_identifiers ";"
-time_declaration : "time" list_of_variable_identifiers ";"
+# real_declaration : "real" list_of_real_identifiers ";"
+real_declaration : "real" list_of_IDENTIFIERs ";"
+# realtime_declaration : "realtime" list_of_real_identifiers ";"
+realtime_declaration : "realtime" list_of_IDENTIFIERs ";"
+# reg_declaration : "reg" [ "signed" ] [ range ] list_of_variable_identifiers ";"
+reg_declaration : "reg" [ "signed" ] [ range ] list_of_IDENTIFIERs ";"
+# time_declaration : "time" list_of_variable_identifiers ";"
+time_declaration : "time" list_of_IDENTIFIERs ";"
 
 # A.2.2 Declaration data types
 # A.2.2.1 Net and variable types
@@ -122,10 +147,14 @@ net_type : "supply0" | "supply1"
          | "tri" | "triand" | "trior" | "tri0" | "tri1"
          | "uwire" | "wire" | "wand" | "wor"
 output_variable_type : "integer" | "time"
-real_type : real_identifier dimension*
-          | real_identifier "=" constant_expression
-variable_type : variable_identifier dimension*
-              | variable_identifier "=" constant_expression
+# real_type : real_identifier dimension*
+real_type : IDENTIFIER dimension*
+#           | real_identifier "=" constant_expression
+          | IDENTIFIER "=" constant_expression
+# variable_type : variable_identifier dimension*
+variable_type : IDENTIFIER dimension*
+#               | variable_identifier "=" constant_expression
+              | IDENTIFIER "=" constant_expression
 
 # A.2.2.2 Strengths
 drive_strength : "(" strength0 "," strength1 ")"
@@ -149,21 +178,31 @@ delay_value : unsigned_number
 
 # A.2.3 Declaration lists
 list_of_defparam_assignments : defparam_assignment ( "," defparam_assignment )*
-list_of_event_identifiers : event_identifier dimension* ( "," event_identifier dimension* )*
+# list_of_event_identifiers : event_identifier dimension* ( "," event_identifier dimension* )*
+list_of_IDENTIFIERs : IDENTIFIER dimension* ( "," IDENTIFIER dimension* )*
 list_of_net_decl_assignments : net_decl_assignment ( "," net_decl_assignment )*
-list_of_net_identifiers : net_identifier dimension* ( "," net_identifier dimension* )*
+# list_of_net_identifiers : net_identifier dimension* ( "," net_identifier dimension* )*
+list_of_IDENTIFIERs : IDENTIFIER dimension* ( "," IDENTIFIER dimension* )*
 list_of_param_assignments : param_assignment ( "," param_assignment )*
-list_of_port_identifiers : port_identifier ( "," port_identifier )*
-list_of_real_identifiers : real_type ( "," real_type )*
+# list_of_port_identifiers : port_identifier ( "," port_identifier )*
+list_of_IDENTIFIERs : IDENTIFIER ( "," IDENTIFIER )*
+# list_of_real_identifiers : real_type ( "," real_type )*
+list_of_IDENTIFIERs : real_type ( "," real_type )*
 list_of_specparam_assignments : specparam_assignment ( "," specparam_assignment )*
-list_of_variable_identifiers : variable_type ( "," variable_type )*
-list_of_variable_port_identifiers : port_identifier [ "=" constant_expression ] ( "," port_identifier [ "=" constant_expression ] )*
+# list_of_variable_identifiers : variable_type ( "," variable_type )*
+list_of_IDENTIFIERs : variable_type ( "," variable_type )*
+# list_of_variable_port_identifiers : port_identifier [ "=" constant_expression ] ( "," port_identifier [ "=" constant_expression ] )*
+list_of_variable_IDENTIFIERs : IDENTIFIER [ "=" constant_expression ] ( "," IDENTIFIER [ "=" constant_expression ] )*
 
 # A.2.4 Declaration assignments
-defparam_assignment : hierarchical_parameter_identifier "=" constant_mintypmax_expression
-net_decl_assignment : net_identifier "=" expression
-param_assignment : parameter_identifier "=" constant_mintypmax_expression
-specparam_assignment : specparam_identifier "=" constant_mintypmax_expression
+# defparam_assignment : hierarchical_parameter_identifier "=" constant_mintypmax_expression
+defparam_assignment : hierarchical_IDENTIFIER "=" constant_mintypmax_expression
+# net_decl_assignment : net_identifier "=" expression
+net_decl_assignment : IDENTIFIER "=" expression
+# param_assignment : parameter_identifier "=" constant_mintypmax_expression
+param_assignment : IDENTIFIER "=" constant_mintypmax_expression
+# specparam_assignment : specparam_identifier "=" constant_mintypmax_expression
+specparam_assignment : IDENTIFIER "=" constant_mintypmax_expression
                      | pulse_control_specparam
 pulse_control_specparam : "PATHPULSE$" "=" "(" reject_limit_value [ "," error_limit_value ] ")"
                         | "PATHPULSE$"specify_input_terminal_descriptor"$"specify_output_terminal_descriptor "=" "(" reject_limit_value [ "," error_limit_value ] ")"
@@ -176,8 +215,10 @@ dimension : "[" dimension_constant_expression ":" dimension_constant_expression 
 range : "[" msb_constant_expression ":" lsb_constant_expression "]"
 
 # A.2.6 Function declarations
-function_declaration : "function" [ "automatic" ] [ function_range_or_type ] function_identifier ";" function_item_declaration function_item_declaration* function_statement "endfunction"
-                     | "function" [ "automatic" ] [ function_range_or_type ] function_identifier "(" function_port_list ")" ";" block_item_declaration* function_statement "endfunction"
+# function_declaration : "function" [ "automatic" ] [ function_range_or_type ] function_identifier ";" function_item_declaration function_item_declaration* function_statement "endfunction"
+function_declaration : "function" [ "automatic" ] [ function_range_or_type ] IDENTIFIER ";" function_item_declaration function_item_declaration* function_statement "endfunction"
+#                      | "function" [ "automatic" ] [ function_range_or_type ] function_identifier "(" function_port_list ")" ";" block_item_declaration* function_statement "endfunction"
+                     | "function" [ "automatic" ] [ function_range_or_type ] IDENTIFIER "(" function_port_list ")" ";" block_item_declaration* function_statement "endfunction"
 function_item_declaration : block_item_declaration
                           | attribute_instance* tf_input_declaration ";"
 function_port_list : attribute_instance* tf_input_declaration ( "," attribute_instance* tf_input_declaration )*
@@ -188,8 +229,10 @@ function_range_or_type : [ "signed" ] [ range ]
                        | "time"
 
 # A.2.7 Task declarations
-task_declaration : "task" [ "automatic" ] task_identifier ";" task_item_declaration* statement_or_null "endtask"
-                 | "task" [ "automatic" ] task_identifier "(" [ task_port_list ] ")" ";" block_item_declaration* statement_or_null "endtask"
+# task_declaration : "task" [ "automatic" ] task_identifier ";" task_item_declaration* statement_or_null "endtask"
+task_declaration : "task" [ "automatic" ] IDENTIFIER ";" task_item_declaration* statement_or_null "endtask"
+#                  | "task" [ "automatic" ] task_identifier "(" [ task_port_list ] ")" ";" block_item_declaration* statement_or_null "endtask"
+                 | "task" [ "automatic" ] IDENTIFIER "(" [ task_port_list ] ")" ";" block_item_declaration* statement_or_null "endtask"
 task_item_declaration : block_item_declaration
                       | attribute_instance* tf_input_declaration ";"
                       | attribute_instance* tf_output_declaration ";"
@@ -198,27 +241,42 @@ task_port_list : task_port_item ( "," task_port_item )*
 task_port_item : attribute_instance* tf_input_declaration
                | attribute_instance* tf_output_declaration
                | attribute_instance* tf_inout_declaration
-tf_input_declaration : "input" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
-                     | "input" task_port_type list_of_port_identifiers
-tf_output_declaration : "output" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
-                      | "output" task_port_type list_of_port_identifiers
-tf_inout_declaration : "inout" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
-                     | "inout" task_port_type list_of_port_identifiers
+# tf_input_declaration : "input" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
+tf_input_declaration : "input" [ "reg" ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+#                      | "input" task_port_type list_of_port_identifiers
+                     | "input" task_port_type list_of_IDENTIFIERs
+# tf_output_declaration : "output" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
+tf_output_declaration : "output" [ "reg" ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+#                       | "output" task_port_type list_of_port_identifiers
+                      | "output" task_port_type list_of_IDENTIFIERs
+# tf_inout_declaration : "inout" [ "reg" ] [ "signed" ] [ range ] list_of_port_identifiers
+tf_inout_declaration : "inout" [ "reg" ] [ "signed" ] [ range ] list_of_IDENTIFIERs
+#                      | "inout" task_port_type list_of_port_identifiers
+                     | "inout" task_port_type list_of_IDENTIFIERs
 task_port_type : "integer" | "real" | "realtime" | "time"
 
 # A.2.8 Block item declarations
-block_item_declaration : attribute_instance* "reg" [ "signed" ] [ range ] list_of_block_variable_identifiers ";"
-                       | attribute_instance* "integer" list_of_block_variable_identifiers ";"
-                       | attribute_instance* "time" list_of_block_variable_identifiers ";"
-                       | attribute_instance* "real" list_of_block_real_identifiers ";"
-                       | attribute_instance* "realtime" list_of_block_real_identifiers ";"
+# block_item_declaration : attribute_instance* "reg" [ "signed" ] [ range ] list_of_block_variable_identifiers ";"
+block_item_declaration : attribute_instance* "reg" [ "signed" ] [ range ] list_of_block_IDENTIFIERs ";"
+#                        | attribute_instance* "integer" list_of_block_variable_identifiers ";"
+                       | attribute_instance* "integer" list_of_block_IDENTIFIERs ";"
+#                        | attribute_instance* "time" list_of_block_variable_identifiers ";"
+                       | attribute_instance* "time" list_of_block_IDENTIFIERs ";"
+#                        | attribute_instance* "real" list_of_block_real_identifiers ";"
+                       | attribute_instance* "real" list_of_block_IDENTIFIERs ";"
+#                        | attribute_instance* "realtime" list_of_block_real_identifiers ";"
+                       | attribute_instance* "realtime" list_of_block_IDENTIFIERs ";"
                        | attribute_instance* event_declaration
                        | attribute_instance* local_parameter_declaration ";"
                        | attribute_instance* parameter_declaration ";"
-list_of_block_variable_identifiers : block_variable_type ( "," block_variable_type )*
-list_of_block_real_identifiers : block_real_type ( "," block_real_type )*
-block_variable_type : variable_identifier dimension*
-block_real_type : real_identifier dimension*
+# list_of_block_variable_identifiers : block_variable_type ( "," block_variable_type )*
+list_of_block_IDENTIFIERs : block_variable_type ( "," block_variable_type )*
+# list_of_block_real_identifiers : block_real_type ( "," block_real_type )*
+list_of_block_IDENTIFIERs : block_real_type ( "," block_real_type )*
+# block_variable_type : variable_identifier dimension*
+block_variable_type : IDENTIFIER dimension*
+# block_real_type : real_identifier dimension*
+block_real_type : IDENTIFIER dimension*
 
 # A.3 Primitive instances
 # A.3.1 Primitive instantiation and instances
@@ -239,7 +297,8 @@ n_output_gate_instance : [ name_of_gate_instance ] "(" output_terminal ( "," out
 pass_switch_instance : [ name_of_gate_instance ] "(" inout_terminal "," inout_terminal ")"
 pass_enable_switch_instance : [ name_of_gate_instance ] "(" inout_terminal "," inout_terminal "," enable_terminal ")"
 pull_gate_instance : [ name_of_gate_instance ] "(" output_terminal ")"
-name_of_gate_instance : gate_instance_identifier [ range ]
+# name_of_gate_instance : gate_instance_identifier [ range ]
+name_of_gate_instance : IDENTIFIER [ range ]
 
 # A.3.2 Primitive strengths
 pulldown_strength : "(" strength0 "," strength1 ")"
@@ -268,32 +327,41 @@ pass_switchtype : "tran" | "rtran"
 
 # A.4 Module instantiation and generate construct
 # A.4.1 Module instantiation
-module_instantiation : module_identifier [ parameter_value_assignment ] module_instance ( "," module_instance )* ";"
+# module_instantiation : module_identifier [ parameter_value_assignment ] module_instance ( "," module_instance )* ";"
+module_instantiation : IDENTIFIER [ parameter_value_assignment ] module_instance ( "," module_instance )* ";"
 parameter_value_assignment : "#" "(" list_of_parameter_assignments ")"
 list_of_parameter_assignments : ordered_parameter_assignment ( "," ordered_parameter_assignment )* 
                               | named_parameter_assignment ( "," named_parameter_assignment )*
 ordered_parameter_assignment : expression
-named_parameter_assignment : "." parameter_identifier "(" [ mintypmax_expression ] ")"
+# named_parameter_assignment : "." parameter_identifier "(" [ mintypmax_expression ] ")"
+named_parameter_assignment : "." IDENTIFIER "(" [ mintypmax_expression ] ")"
 module_instance : name_of_module_instance "(" [ list_of_port_connections ] ")"
-name_of_module_instance : module_instance_identifier [ range ]
+# name_of_module_instance : module_instance_identifier [ range ]
+name_of_module_instance : IDENTIFIER [ range ]
 list_of_port_connections : ordered_port_connection ( "," ordered_port_connection )*
                          | named_port_connection ( "," named_port_connection )*
 ordered_port_connection : attribute_instance* [ expression ]
-named_port_connection : attribute_instance* "." port_identifier "(" [ expression ] ")"
+# named_port_connection : attribute_instance* "." port_identifier "(" [ expression ] ")"
+named_port_connection : attribute_instance* "." IDENTIFIER "(" [ expression ] ")"
 
 # A.4.2 Generate construct
 generate_region : "generate" module_or_generate_item* "endgenerate"
-genvar_declaration : "genvar" list_of_genvar_identifiers ";"
-list_of_genvar_identifiers : genvar_identifier ( "," genvar_identifier )*
+# genvar_declaration : "genvar" list_of_genvar_identifiers ";"
+genvar_declaration : "genvar" list_of_IDENTIFIERs ";"
+# list_of_genvar_identifiers : genvar_identifier ( "," genvar_identifier )*
+list_of_IDENTIFIERs : IDENTIFIER ( "," IDENTIFIER )*
 loop_generate_construct : "for" "(" genvar_initialization ";" genvar_expression ";" genvar_iteration ")" generate_block
-genvar_initialization : genvar_identifier "=" constant_expression
+# genvar_initialization : genvar_identifier "=" constant_expression
+genvar_initialization : IDENTIFIER "=" constant_expression
 genvar_expression : genvar_primary
                   | unary_operator attribute_instance* genvar_primary
                   | genvar_expression binary_operator attribute_instance* genvar_expression
                   | genvar_expression "?" attribute_instance* genvar_expression ":" genvar_expression
-genvar_iteration : genvar_identifier "=" genvar_expression
+# genvar_iteration : genvar_identifier "=" genvar_expression
+genvar_iteration : IDENTIFIER "=" genvar_expression
 genvar_primary : constant_primary
-               | genvar_identifier
+#                | genvar_identifier
+               | IDENTIFIER
 conditional_generate_construct : if_generate_construct
                                | case_generate_construct
 if_generate_construct : "if" "(" constant_expression ")" generate_block_or_null [ "else" generate_block_or_null ]
@@ -301,32 +369,41 @@ case_generate_construct : "case" "(" constant_expression ")" case_generate_item 
 case_generate_item : constant_expression ( "," constant_expression )* ":" generate_block_or_null
                    | "default" [ ":" ] generate_block_or_null
 generate_block : module_or_generate_item
-               | "begin" [ ":" generate_block_identifier ] module_or_generate_item* "end"
+#                | "begin" [ ":" generate_block_identifier ] module_or_generate_item* "end"
+               | "begin" [ ":" IDENTIFIER ] module_or_generate_item* "end"
 generate_block_or_null : generate_block
                        | ";"
 
 # A.5 UDP declaration and instantiation
 # A.5.1 UDP declaration
-udp_declaration : attribute_instance* "primitive" udp_identifier "(" udp_port_list ")" ";" udp_port_declaration udp_port_declaration* udp_body "endprimitive"
-                | attribute_instance* "primitive" udp_identifier "(" udp_declaration_port_list ")" ";" udp_body "endprimitive"
+# udp_declaration : attribute_instance* "primitive" udp_identifier "(" udp_port_list ")" ";" udp_port_declaration udp_port_declaration* udp_body "endprimitive"
+udp_declaration : attribute_instance* "primitive" IDENTIFIER "(" udp_port_list ")" ";" udp_port_declaration udp_port_declaration* udp_body "endprimitive"
+#                 | attribute_instance* "primitive" udp_identifier "(" udp_declaration_port_list ")" ";" udp_body "endprimitive"
+                | attribute_instance* "primitive" IDENTIFIER "(" udp_declaration_port_list ")" ";" udp_body "endprimitive"
 
 # A.5.2 UDP ports
-udp_port_list : output_port_identifier "," input_port_identifier ( "," input_port_identifier )*
+# udp_port_list : output_port_identifier "," input_port_identifier ( "," input_port_identifier )*
+udp_port_list : IDENTIFIER "," IDENTIFIER ( "," IDENTIFIER )*
 udp_declaration_port_list : udp_output_declaration "," udp_input_declaration ( "," udp_input_declaration )*
 udp_port_declaration : udp_output_declaration ";"
                      | udp_input_declaration ";"
                      | udp_reg_declaration ";"
-udp_output_declaration : attribute_instance* "output" port_identifier
-                       | attribute_instance* "output" "reg" port_identifier [ "=" constant_expression ]
-udp_input_declaration : attribute_instance* "input" list_of_port_identifiers
-udp_reg_declaration : attribute_instance* "reg" variable_identifier
+# udp_output_declaration : attribute_instance* "output" port_identifier
+udp_output_declaration : attribute_instance* "output" IDENTIFIER
+#                        | attribute_instance* "output" "reg" port_identifier [ "=" constant_expression ]
+                       | attribute_instance* "output" "reg" IDENTIFIER [ "=" constant_expression ]
+# udp_input_declaration : attribute_instance* "input" list_of_port_identifiers
+udp_input_declaration : attribute_instance* "input" list_of_IDENTIFIERs
+# udp_reg_declaration : attribute_instance* "reg" variable_identifier
+udp_reg_declaration : attribute_instance* "reg" IDENTIFIER
 
 # A.5.3 UDP body
 udp_body : combinational_body | sequential_body
 combinational_body : "table" combinational_entry combinational_entry* "endtable"
 combinational_entry : level_input_list ":" output_symbol ";"
 sequential_body : [ udp_initial_statement ] "table" sequential_entry sequential_entry* "endtable"
-udp_initial_statement : "initial" output_port_identifier "=" init_val ";"
+# udp_initial_statement : "initial" output_port_identifier "=" init_val ";"
+udp_initial_statement : "initial" IDENTIFIER "=" init_val ";"
 init_val : "1'b0" | "1'b1" | "1'bx" | "1'bX" | "1'B0" | "1'B1" | "1'Bx" | "1'BX" | "1" | "0"
 sequential_entry : seq_input_list ":" current_state ":" next_state ";"
 seq_input_list : level_input_list | edge_input_list
@@ -340,9 +417,11 @@ level_symbol : "0" | "1" | "x" | "X" | "?" | "b" | "B"
 edge_symbol : "r" | "R" | "f" | "F" | "p" | "P" | "n" | "N" | "*"
 
 # A.5.4 UDP instantiation
-udp_instantiation : udp_identifier [ drive_strength ] [ delay2 ] udp_instance ( "," udp_instance )* ";"
+# udp_instantiation : udp_identifier [ drive_strength ] [ delay2 ] udp_instance ( "," udp_instance )* ";"
+udp_instantiation : IDENTIFIER [ drive_strength ] [ delay2 ] udp_instance ( "," udp_instance )* ";"
 udp_instance : [ name_of_udp_instance ] "(" output_terminal "," input_terminal ( "," input_terminal )* ")"
-name_of_udp_instance : udp_instance_identifier [ range ]
+# name_of_udp_instance : udp_instance_identifier [ range ]
+name_of_udp_instance : IDENTIFIER [ range ]
 
 # A.6 Behavioral statements
 # A.6.1 Continuous assignment statements
@@ -394,13 +473,16 @@ delay_control : "#" delay_value
 delay_or_event_control : delay_control
                        | event_control
                        | "repeat" "(" expression ")" event_control
-disable_statement : "disable" hierarchical_task_identifier ";"
+# disable_statement : "disable" hierarchical_task_identifier ";"
+disable_statement : "disable" hierarchical_IDENTIFIER ";"
                   | "disable" hierarchical_block_identifier ";"
-event_control : "@" hierarchical_event_identifier
+# event_control : "@" hierarchical_event_identifier
+event_control : "@" hierarchical_IDENTIFIER
               | "@" "(" event_expression ")"
               | "@*"
               | "@" "(*)"
-event_trigger : "->" hierarchical_event_identifier ( "[" expression "]" )* ";"
+# event_trigger : "->" hierarchical_event_identifier ( "[" expression "]" )* ";"
+event_trigger : "->" hierarchical_IDENTIFIER ( "[" expression "]" )* ";"
 event_expression : expression
                  | "posedge" expression
                  | "negedge" expression
@@ -430,8 +512,10 @@ loop_statement : "forever" statement
                | "for" "(" variable_assignment ";" expression ";" variable_assignment ")" statement
 
 # A.6.9 Task enable statements
-system_task_enable : system_task_identifier [ "(" [ expression ] ( "," [ expression ] )* ")" ] ";"
-task_enable : hierarchical_task_identifier [ "(" expression ( "," expression )* ")" ] ";"
+# system_task_enable : system_task_identifier [ "(" [ expression ] ( "," [ expression ] )* ")" ] ";"
+system_task_enable : system_IDENTIFIER [ "(" [ expression ] ( "," [ expression ] )* ")" ] ";"
+# task_enable : hierarchical_task_identifier [ "(" expression ( "," expression )* ")" ] ";"
+task_enable : hierarchical_IDENTIFIER [ "(" expression ( "," expression )* ")" ] ";"
 
 # A.7 Specify section
 # A.7.1 Specify block declaration
@@ -460,8 +544,10 @@ list_of_path_outputs : specify_output_terminal_descriptor ( "," specify_output_t
 # A.7.3 Specify block terminals
 specify_input_terminal_descriptor : input_identifier [ "[" constant_range_expression "]" ]
 specify_output_terminal_descriptor : output_identifier [ "[" constant_range_expression "]" ]
-input_identifier : input_port_identifier | inout_port_identifier
-output_identifier : output_port_identifier | inout_port_identifier
+# input_identifier : input_port_identifier | inout_port_identifier
+input_identifier : IDENTIFIER | IDENTIFIER
+# output_identifier : output_port_identifier | inout_port_identifier
+output_identifier : IDENTIFIER | IDENTIFIER
 
 # A.7.4 Specify path delays
 path_delay_value : list_of_path_delay_expressions
@@ -530,13 +616,18 @@ nochange_timing_check : "$nochange" "(" reference_event "," data_event "," start
 checktime_condition : mintypmax_expression
 controlled_reference_event : controlled_timing_check_event
 data_event : timing_check_event
-delayed_data : terminal_identifier
-             | terminal_identifier "[" constant_mintypmax_expression "]"
-delayed_reference : terminal_identifier
-                  | terminal_identifier "[" constant_mintypmax_expression "]"
+# delayed_data : terminal_identifier
+delayed_data : IDENTIFIER
+#              | terminal_identifier "[" constant_mintypmax_expression "]"
+             | IDENTIFIER "[" constant_mintypmax_expression "]"
+# delayed_reference : terminal_identifier
+delayed_reference : IDENTIFIER
+#                   | terminal_identifier "[" constant_mintypmax_expression "]"
+                  | IDENTIFIER "[" constant_mintypmax_expression "]"
 end_edge_offset : mintypmax_expression
 event_based_flag : constant_expression
-notifier : variable_identifier
+# notifier : variable_identifier
+notifier : IDENTIFIER
 reference_event : timing_check_event
 remain_active_flag : constant_expression
 stamptime_condition : mintypmax_expression
@@ -579,10 +670,14 @@ module_path_multiple_concatenation : "{" constant_expression module_path_concate
 multiple_concatenation : "{" constant_expression concatenation "}"
 
 # A.8.2 Function calls
-constant_function_call : function_identifier attribute_instance* "(" constant_expression ( "," constant_expression )* ")"
-constant_system_function_call : system_function_identifier "(" constant_expression ( "," constant_expression )* ")"
-function_call : hierarchical_function_identifier attribute_instance* "(" expression ( "," expression )* ")"
-system_function_call : system_function_identifier [ "(" expression ( "," expression )* ")" ]
+# constant_function_call : function_identifier attribute_instance* "(" constant_expression ( "," constant_expression )* ")"
+constant_function_call : IDENTIFIER attribute_instance* "(" constant_expression ( "," constant_expression )* ")"
+# constant_system_function_call : system_function_identifier "(" constant_expression ( "," constant_expression )* ")"
+constant_system_function_call : system_IDENTIFIER "(" constant_expression ( "," constant_expression )* ")"
+# function_call : hierarchical_function_identifier attribute_instance* "(" expression ( "," expression )* ")"
+function_call : hierarchical_IDENTIFIER attribute_instance* "(" expression ( "," expression )* ")"
+# system_function_call : system_function_identifier [ "(" expression ( "," expression )* ")" ]
+system_function_call : system_IDENTIFIER [ "(" expression ( "," expression )* ")" ]
 
 # A.8.3 Expressions
 base_expression : expression
@@ -625,8 +720,10 @@ width_constant_expression : constant_expression
 
 # A.8.4 Primaries
 constant_primary : number
-                 | parameter_identifier [ "[" constant_range_expression "]" ]
-                 | specparam_identifier [ "[" constant_range_expression "]" ]
+#                  | parameter_identifier [ "[" constant_range_expression "]" ]
+                 | IDENTIFIER [ "[" constant_range_expression "]" ]
+#                  | specparam_identifier [ "[" constant_range_expression "]" ]
+                 | IDENTIFIER [ "[" constant_range_expression "]" ]
                  | constant_concatenation
                  | constant_multiple_concatenation
                  | constant_function_call
@@ -650,9 +747,11 @@ primary : number
         | string
 
 # A.8.5 Expression left-side values
-net_lvalue : hierarchical_net_identifier [ ( "[" constant_expression "]" )* "[" constant_range_expression "]" ]
+# net_lvalue : hierarchical_net_identifier [ ( "[" constant_expression "]" )* "[" constant_range_expression "]" ]
+net_lvalue : hierarchical_IDENTIFIER [ ( "[" constant_expression "]" )* "[" constant_range_expression "]" ]
            | "{" net_lvalue ( "," net_lvalue )* "}"
-variable_lvalue : hierarchical_variable_identifier [ ( "[" expression "]" )* "[" range_expression "]" ]
+# variable_lvalue : hierarchical_variable_identifier [ ( "[" expression "]" )* "[" range_expression "]" ]
+variable_lvalue : hierarchical_IDENTIFIER [ ( "[" expression "]" )* "[" range_expression "]" ]
                 | "{" variable_lvalue ( "," variable_lvalue )* "}"
 
 # A.8.6 Operators
@@ -719,47 +818,79 @@ BLOCK_COMMENT : /\/\*(\*(?!\/)|[^*])*\*\//
 
 # A.9.3 Identifiers
 # block_identifier : IDENTIFIER
-cell_identifier : IDENTIFIER
-config_identifier : IDENTIFIER
+# cell_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# config_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 #ESCAPED_IDENTIFIER : \ Any_ASCII_character_except_white_space* white_space
 ESCAPED_IDENTIFIER : "\\" ( /\S/ )* /\s/
-event_identifier : IDENTIFIER
-function_identifier : IDENTIFIER
-gate_instance_identifier : IDENTIFIER
-generate_block_identifier : IDENTIFIER
-genvar_identifier : IDENTIFIER
+# event_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# function_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# gate_instance_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# generate_block_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# genvar_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 hierarchical_block_identifier : hierarchical_identifier
-hierarchical_event_identifier : hierarchical_identifier
-hierarchical_function_identifier : hierarchical_identifier
+# hierarchical_event_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
+# hierarchical_function_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
 hierarchical_identifier : ( IDENTIFIER [ "[" constant_expression "]" ] "." )* IDENTIFIER
-hierarchical_net_identifier : hierarchical_identifier
-hierarchical_parameter_identifier : hierarchical_identifier
-hierarchical_variable_identifier : hierarchical_identifier
-hierarchical_task_identifier : hierarchical_identifier
+# hierarchical_net_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
+# hierarchical_parameter_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
+# hierarchical_variable_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
+# hierarchical_task_identifier : hierarchical_identifier
+hierarchical_IDENTIFIER : hierarchical_identifier
 IDENTIFIER : SIMPLE_IDENTIFIER
            | ESCAPED_IDENTIFIER
-inout_port_identifier : IDENTIFIER
-input_port_identifier : IDENTIFIER
+# inout_port_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# input_port_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 # INSTANCE_IDENTIFIER : IDENTIFIER
-library_identifier : IDENTIFIER
-module_identifier : IDENTIFIER
-module_instance_identifier : IDENTIFIER
-net_identifier : IDENTIFIER
-output_port_identifier : IDENTIFIER
-parameter_identifier : IDENTIFIER
-port_identifier : IDENTIFIER
-real_identifier : IDENTIFIER
+# library_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# module_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# module_instance_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# net_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# output_port_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# parameter_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# port_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# real_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 SIMPLE_IDENTIFIER : /[a-zA-Z_]/( /[a-zA-Z0-9_$]/ )*
-specparam_identifier : IDENTIFIER
-system_function_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
-system_task_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
-task_identifier : IDENTIFIER
-terminal_identifier : IDENTIFIER
-text_macro_identifier : IDENTIFIER
+# specparam_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# system_function_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
+system_IDENTIFIER : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
+# system_task_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
+system_IDENTIFIER : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
+# task_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# terminal_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# text_macro_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 # TOPMODULE_IDENTIFIER : IDENTIFIER
-udp_identifier : IDENTIFIER
-udp_instance_identifier : IDENTIFIER
-variable_identifier : IDENTIFIER
+# udp_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# udp_instance_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
+# variable_identifier : IDENTIFIER
+IDENTIFIER : IDENTIFIER
 
 # A.9.4 White space
 # white_space : space | tab | newline | eof
