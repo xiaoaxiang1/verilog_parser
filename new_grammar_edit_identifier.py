@@ -84,7 +84,7 @@ config_rule_statement : default_clause liblist_clause ";"
                       | cell_clause use_clause ";"
 default_clause : "default"
 inst_clause : "instance" inst_name
-# inst_name : TOPMODULE_IDENTIFIER ( "." INSTANCE_IDENTIFIER )*
+# inst_name : topmodule_identifier ( "." instance_identifier )*
 inst_name : IDENTIFIER ( "." IDENTIFIER )*
 # cell_clause : "cell" [ library_identifier"."]cell_identifier
 cell_clause : "cell" [ IDENTIFIER"."]IDENTIFIER
@@ -458,9 +458,10 @@ procedural_timing_control_statement : procedural_timing_control statement_or_nul
 wait_statement : "wait" "(" expression ")" statement_or_null
 
 # A.6.6 Conditional statements
-conditional_statement : "if" "(" expression ")" statement_or_null [ "else" statement_or_null ]
-                      | if_else_if_statement
-if_else_if_statement : "if" "(" expression ")" statement_or_null ( "else" "if" "(" expression ")" statement_or_null )* [ "else" statement_or_null ]
+# conditional_statement : "if" "(" expression ")" statement_or_null [ "else" statement_or_null ]
+#                       | if_else_if_statement
+# if_else_if_statement : "if" "(" expression ")" statement_or_null ( "else" "if" "(" expression ")" statement_or_null )* [ "else" statement_or_null ]
+conditional_statement : "if" "(" expression ")" statement_or_null ( "else" "if" "(" expression ")" statement_or_null )* [ "else" statement_or_null ]
 
 # A.6.7 Case statements
 case_statement : "case" "(" expression ")" case_item case_item* "endcase"
@@ -514,28 +515,35 @@ output_identifier : IDENTIFIER | IDENTIFIER
 # A.7.4 Specify path delays
 path_delay_value : list_of_path_delay_expressions
                  | "(" list_of_path_delay_expressions ")"
-list_of_path_delay_expressions : t_path_delay_expression
-                               | trise_path_delay_expression "," tfall_path_delay_expression
-                               | trise_path_delay_expression "," tfall_path_delay_expression "," tz_path_delay_expression
-                               | t01_path_delay_expression "," t10_path_delay_expression "," t0z_path_delay_expression "," tz1_path_delay_expression "," t1z_path_delay_expression "," tz0_path_delay_expression
-                               | t01_path_delay_expression "," t10_path_delay_expression "," t0z_path_delay_expression "," tz1_path_delay_expression "," t1z_path_delay_expression "," tz0_path_delay_expression "," t0x_path_delay_expression "," tx1_path_delay_expression "," t1x_path_delay_expression "," tx0_path_delay_expression "," txz_path_delay_expression "," tzx_path_delay_expression
-t_path_delay_expression : path_delay_expression
-trise_path_delay_expression : path_delay_expression
-tfall_path_delay_expression : path_delay_expression
-tz_path_delay_expression : path_delay_expression
-t01_path_delay_expression : path_delay_expression
-t10_path_delay_expression : path_delay_expression
-t0z_path_delay_expression : path_delay_expression
-tz1_path_delay_expression : path_delay_expression
-t1z_path_delay_expression : path_delay_expression
-tz0_path_delay_expression : path_delay_expression
-t0x_path_delay_expression : path_delay_expression
-tx1_path_delay_expression : path_delay_expression
-t1x_path_delay_expression : path_delay_expression
-tx0_path_delay_expression : path_delay_expression
-txz_path_delay_expression : path_delay_expression
-tzx_path_delay_expression : path_delay_expression
-path_delay_expression : constant_mintypmax_expression
+
+# list_of_path_delay_expressions : t_path_delay_expression
+#                                | trise_path_delay_expression "," tfall_path_delay_expression
+#                                | trise_path_delay_expression "," tfall_path_delay_expression "," tz_path_delay_expression
+#                                | t01_path_delay_expression "," t10_path_delay_expression "," t0z_path_delay_expression "," tz1_path_delay_expression "," t1z_path_delay_expression "," tz0_path_delay_expression
+#                                | t01_path_delay_expression "," t10_path_delay_expression "," t0z_path_delay_expression "," tz1_path_delay_expression "," t1z_path_delay_expression "," tz0_path_delay_expression "," t0x_path_delay_expression "," tx1_path_delay_expression "," t1x_path_delay_expression "," tx0_path_delay_expression "," txz_path_delay_expression "," tzx_path_delay_expression
+# t_path_delay_expression : path_delay_expression
+# trise_path_delay_expression : path_delay_expression
+# tfall_path_delay_expression : path_delay_expression
+# tz_path_delay_expression : path_delay_expression
+# t01_path_delay_expression : path_delay_expression
+# t10_path_delay_expression : path_delay_expression
+# t0z_path_delay_expression : path_delay_expression
+# tz1_path_delay_expression : path_delay_expression
+# t1z_path_delay_expression : path_delay_expression
+# tz0_path_delay_expression : path_delay_expression
+# t0x_path_delay_expression : path_delay_expression
+# tx1_path_delay_expression : path_delay_expression
+# t1x_path_delay_expression : path_delay_expression
+# tx0_path_delay_expression : path_delay_expression
+# txz_path_delay_expression : path_delay_expression
+# tzx_path_delay_expression : path_delay_expression
+# path_delay_expression : constant_mintypmax_expression
+list_of_path_delay_expressions : constant_mintypmax_expression ~ 1
+                               | constant_mintypmax_expression ~ 2
+				   | constant_mintypmax_expression ~ 3
+				   | constant_mintypmax_expression ~ 6
+				   | constant_mintypmax_expression ~ 12
+
 edge_sensitive_path_declaration : parallel_edge_sensitive_path_description "=" path_delay_value
                                 | full_edge_sensitive_path_description "=" path_delay_value
 parallel_edge_sensitive_path_description : "(" [ edge_identifier ] specify_input_terminal_descriptor "=>" "(" specify_output_terminal_descriptor [ polarity_operator ] ":" data_source_expression ")" ")"
@@ -796,7 +804,7 @@ IDENTIFIER : SIMPLE_IDENTIFIER
            | ESCAPED_IDENTIFIER
 # inout_port_identifier : IDENTIFIER
 # input_port_identifier : IDENTIFIER
-# INSTANCE_IDENTIFIER : IDENTIFIER
+# instance_identifier : IDENTIFIER
 # library_identifier : IDENTIFIER
 # module_identifier : IDENTIFIER
 # module_instance_identifier : IDENTIFIER
@@ -812,7 +820,7 @@ system_task_identifier : /\$[a-zA-Z0-9_\$]/( /[a-zA-Z0-9_\$]/ )*
 # task_identifier : IDENTIFIER
 # terminal_identifier : IDENTIFIER
 # text_macro_identifier : IDENTIFIER
-# TOPMODULE_IDENTIFIER : IDENTIFIER
+# topmodule_identifier : IDENTIFIER
 # udp_identifier : IDENTIFIER
 # udp_instance_identifier : IDENTIFIER
 # variable_identifier : IDENTIFIER
